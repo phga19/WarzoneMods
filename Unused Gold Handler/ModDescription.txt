@@ -1,0 +1,3 @@
+At the end of your turn, any unspent gold is counted towards a bonus/malus.
+The host configures what settings of bonus/malus to use among several options before game start.
+Does nothing if commerce is not enabled.
