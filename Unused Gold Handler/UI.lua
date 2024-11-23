@@ -986,3 +986,38 @@ function getSliderPreferredWidth(name)
 	if type(obj) ~= type(table) then print("object given to getSliderPreferredWidth was " .. type(obj) .. ", expected a table"); return; end
 	return obj.GetSliderPreferredWidth();
 end
+
+function labelButtonNumberField(vert, key, min, max, textLabel, inputs, textAlertStart, textAlertEnd)
+	local line = newHorizontalGroup(win .. key .. "H1", vert);
+	newLabel(win .. key .. "L", line, textLabel, textColor);
+	local line = newHorizontalGroup(win .. key .. "H2", vert);
+	local func = function()
+		SaveInputs();
+		local text = textAlertStart .. Round(inputs[key]*10) .. textAlertEnd;
+		UI.Alert(text)
+	end;
+	newButton(win .. key .. "B", line, "?", func, buttonColor);
+	return newNumberField(win .. key .. "I", line, min, max, inputs[key], true, false);
+end
+function alertTextButtonStart()
+	return "If you end your turn with 10 gold leftover, you will receive an additional ";
+end
+function alertTextButtonConstStart()
+	return "If you end your turn with 1 or more gold leftover, you will receive an additional ";
+end
+ 
+function alertTextButtonEnd()
+	return " gold from this option.";
+end
+
+function emptyLine(id, vert)
+	local fullId = "EmptyLine" .. id;
+	local line = newHorizontalGroup(win .. fullId, vert);
+	return newLabel(win .. fullId, line, "\n\n", mainTextColor);
+end
+
+function getUIName(suffix, name)
+	local prefix = win;
+	print("return : " .. prefix .. name .. suffix);
+	return prefix .. name .. suffix;
+end

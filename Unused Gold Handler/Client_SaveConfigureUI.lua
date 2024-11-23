@@ -1,48 +1,64 @@
+require("UI");
 function Client_SaveConfigureUI(alert)
 	print("Client_SaveConfigureUI")
-	Mod.Settings.TargetMe = getIsChecked(win .. "MeCheckBox")
+	Mod.Settings.TargetMe = getIsChecked(win .. "MeCheckBox");
 	Mod.Settings.TargetAllies = getIsChecked(win .. "AlliesCheckBox")
 	Mod.Settings.TargetEnnemies = getIsChecked(win .. "EnnemiesCheckBox")
 	Mod.Settings.Advanced = getIsChecked(win .. "AdvancedCheckBox")
+	local suffix = "I"
+	local TextToSorF =
+	{
+		["Success only"] = "S",
+		["Failure only"] = "F",
+		["Success and Failure"] = "SF",
+	}
 	if Mod.Settings.TargetMe then
-		Mod.Settings.A = getValue(win .. "InputA");
-		Mod.Settings.B = getValue(win .. "InputB");
+		Mod.Settings.Me = getValue(getUIName(suffix, "Me"));
+		Mod.Settings.Const = getValue(getUIName(suffix, "Const"));
 	else
-		Mod.Settings.A = 0;
-		Mod.Settings.B = 0;
+		Mod.Settings.Me = 0;
+		Mod.Settings.Const = 0;
 	end
 	if Mod.Settings.TargetAllies then
-		Mod.Settings.C = getValue(win .. "InputC");
+		Mod.Settings.Ally = getValue(getUIName(suffix, "Ally"));
 	else
-		Mod.Settings.C = 0;
+		Mod.Settings.Ally = 0;
 	end
 	if Mod.Settings.TargetEnnemies then
-		Mod.Settings.D = getValue(win .. "InputD");
+		Mod.Settings.Ennemy = getValue(getUIName(suffix, "Ennemy"));
 	else
-		Mod.Settings.D = 0;
+		Mod.Settings.Ennemy = 0;
 	end
 	if Mod.Settings.Advanced then
-		Mod.Settings.E = getValue(win .. "InputE");
-		Mod.Settings.F = getValue(win .. "InputF");
-		Mod.Settings.G = getValue(win .. "InputG");
-		Mod.Settings.H = getValue(win .. "InputH");
-		Mod.Settings.I = getValue(win .. "InputI");
-		Mod.Settings.J = getValue(win .. "InputJ");
-		Mod.Settings.K = getValue(win .. "InputK");
-		Mod.Settings.L = getValue(win .. "InputL");
-		Mod.Settings.M = getValue(win .. "InputM");
-		Mod.Settings.N = getValue(win .. "InputN");
+		Mod.Settings.Income = getValue(getUIName(suffix, "Income"));
+		Mod.Settings.Turn = getValue(getUIName(suffix, "Turn"));
+		Mod.Settings.G = getValue(getUIName(suffix, "G"));
+		Mod.Settings.H = getValue(getUIName(suffix, "H"));
+		Mod.Settings.TerritoryCapture = getValue(getUIName(suffix, "TerritoryCapture"));
+		Mod.Settings.BonusCaptured = getValue(getUIName(suffix, "BonusCaptured"));
+		Mod.Settings.DefendingKills = getValue(getUIName(suffix, "DefendingKills"));
+		Mod.Settings.DefendingKillSorF = TextToSorF[getText(win .. "DefendingKillsSorFButton2")];
+		Mod.Settings.AttackingKills = getValue(getUIName(suffix, "AttackingKills"));
+		Mod.Settings.AttackingKillSorF = TextToSorF[getText(win .. "AttackingKillsSorFButton2")];
+		Mod.Settings.DefendingSpeKills = getValue(getUIName(suffix, "DefendingSpeKills"));
+		Mod.Settings.DefendingSpeKillSorF = TextToSorF[getText(win .. "DefendingSpeKillsSorFButton2")];
+		Mod.Settings.AttackingSpeKills = getValue(getUIName(suffix, "AttackingSpeKills"));
+		Mod.Settings.AttackingSpeKillSorF = TextToSorF[getText(win .. "AttackingSpeKillsSorFButton2")];
 	else
-		Mod.Settings.E = 0;
-		Mod.Settings.F = 0;
+		Mod.Settings.Income = 0;
+		Mod.Settings.Turn = 0;
 		Mod.Settings.G = 0;
 		Mod.Settings.H = 0;
-		Mod.Settings.I = 0;
-		Mod.Settings.J = 0;
-		Mod.Settings.K = 0;
-		Mod.Settings.L = 0;
-		Mod.Settings.M = 0;
-		Mod.Settings.N = 0;
+		Mod.Settings.TerritoryCapture = 0;
+		Mod.Settings.BonusCaptured = 0;
+		Mod.Settings.DefendingKills = 0;
+		Mod.Settings.DefendingKillSorF = "SF";
+		Mod.Settings.AttackingKills = 0;
+		Mod.Settings.AttackingKillSorF = "SF";
+		Mod.Settings.DefendingSpeKills = 0;
+		Mod.Settings.DefendingSpeKillSorF = "SF";
+		Mod.Settings.AttackingSpeKills = 0;
+		Mod.Settings.AttackingSpeKillSorF = "SF";
 	end
 end
 

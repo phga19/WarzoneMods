@@ -1,21 +1,34 @@
 require("util");
 function Server_AdvanceTurn_Start(game, addNewOrder)
 	print("Server_AdvanceTurn_Start")
-	OrderBonus = {};
-	for playerID, playerData in pairs(game.Game.PlayingPlayers) do
-		OrderBonus[playerID] = 0;
+	local playerGameData = Mod.PlayerGameData;
+	tTerritoryCaptured = {};
+	tBonusCaptured = {};
+	tDefendingKills = {};
+	tAttackingKills = {};
+	tDefendingSpeKills = {};
+	tAttackingSpeKills = {};
+	for playerID, playerData in pairs(game.Game.PlayingPlayers) do  -- this or game.ServerGame.Game.Players?
+		-- if playerID.IsAI == false then -- TODO add option to not do computation on AIs
+		tTerritoryCaptured[playerID] = 0;
+		tBonusCaptured[playerID] = 0;
+		tDefendingKills[playerID] = 0;
+		tAttackingKills[playerID] = 0;
+		tDefendingSpeKills[playerID] = 0;
+		tAttackingSpeKills[playerID] = 0;
 	end
+	
 end
 
 function Server_AdvanceTurn_Order(game, order, result, skipThisOrder, addNewOrder)
 	if(order.proxyType == "GameOrderAttackTransfer") then
 		if result.IsAttack then
 			if result.IsSuccessful and order.PlayerID ~= WL.PlayerID.Neutral then
-				OrderBonus[order.PlayerID] = OrderBonus[order.PlayerID] + Mod.Settings.I;
-				if Mod.Settings.J ~= 0 then
+				tTerritoryCaptured[order.PlayerID] = tTerritoryCaptured[order.PlayerID] + Mod.Settings.TerritoryCapture;
+				if Mod.Settings.BonusCapture ~= 0 then
 					for _, bonus in pairs(game.Map.Territories[order.To].PartOfBonuses) do
 						if BonusOwned(game, bonus, order.To, order.PlayerID) then
-							OrderBonus[order.PlayerID] = OrderBonus[order.PlayerID] + Mod.Settings.J;
+							tBonusCaptured[order.PlayerID] = tBonusCaptured[order.PlayerID] + Mod.Settings.BonusCapture;
 						end
 					end
 				end
@@ -23,16 +36,31 @@ function Server_AdvanceTurn_Order(game, order, result, skipThisOrder, addNewOrde
 			local territory = game.ServerGame.LatestTurnStanding.Territories[order.To];
 			local owner = territory.OwnerPlayerID;
 			if owner ~= order.PlayerID then
-				if order.PlayerID ~= WL.PlayerID.Neutral and (result.IsSuccessful and Mod.Settings.KSuccess or not result.IsSuccessful and Mod.Settings.KFail) then
-					OrderBonus[order.PlayerID] = OrderBonus[order.PlayerID] + Mod.Settings.K*result.DefendingArmiesKilled.NumArmies;
+				if order.PlayerID ~= WL.PlayerID.Neutral and Mod.Settings.DefendingKills ~= 0 and
+				((result.IsSuccessful and Mod.Settings.DefendingKillSorF ~= "F")  or ((not result.IsSuccessful) and Mod.Settings.DefendingKillSorF ~= "S")) then
+					tDefendingKills[order.PlayerID] = tDefendingKills[order.PlayerID] + Mod.Settings.DefendingKills*result.DefendingArmiesKilled.NumArmies;
 				end
-				if owner ~= WL.PlayerID.Neutral and (result.IsSuccessful and Mod.Settings.LSuccess or not result.IsSuccessful and Mod.Settings.LFail) then
-					OrderBonus[order.PlayerID] = OrderBonus[order.PlayerID] + Mod.Settings.L*result.AttackingArmiesKilled.NumArmies;
+				if owner ~= WL.PlayerID.Neutral and Mod.Settings.AttackingKills ~= 0 and
+				((result.IsSuccessful and Mod.Settings.AttackingKillSorF ~= "F") or ((not result.IsSuccessful) and Mod.Settings.AttackingKillSorF ~= "S")) then
+					tAttackingKills[order.PlayerID] = tAttackingKills[order.PlayerID] + Mod.Settings.AttackingKills*result.AttackingArmiesKilled.NumArmies;
 				end
-				print("SpecialUnits");
-				SpecialUnits = table.unpack(table.unpack(territory.NumArmies.SpecialUnits) or {})
-				print(SpecialUnits);
-				print("result.DamageToSpecialUnits      :" .. (table.unpack(result.DamageToSpecialUnits) or ""))
+				
+				if order.PlayerID ~= WL.PlayerID.Neutral and Mod.Settings.DefendingSpeKills ~= 0 and
+				((result.IsSuccessful and Mod.Settings.DefendingSpeKillSorF ~= "F") or ((not result.IsSuccessful) and Mod.Settings.DefendingSpeKillSorF ~= "S")) then
+					local count = 0
+					for _, unit in ipairs(result.DefendingArmiesKilled.SpecialUnits) do
+						count = count + 1
+					end
+					tDefendingSpeKills[order.PlayerID] = tDefendingSpeKills[order.PlayerID] + Mod.Settings.DefendingSpeKills*count;
+				end
+				if owner ~= WL.PlayerID.Neutral and Mod.Settings.AttackingSpeKills ~= 0 and
+				((result.IsSuccessful and Mod.Settings.AttackingSpeKillSorF ~= "F") or ((not result.IsSuccessful) and Mod.Settings.AttackingSpeKillSorF ~= "S")) then
+					local count = 0
+					for _, unit in ipairs(result.AttackingArmiesKilled.SpecialUnits) do
+						count = count + 1
+					end
+					tAttackingSpeKills[order.PlayerID] = tAttackingSpeKills[order.PlayerID] + Mod.Settings.AttackingSpeKills*count;
+				end
 				-- if territory.NumArmies.SpecialUnits > 0 and order.PlayerID ~= WL.PlayerID.Neutral and (result.IsSuccessful and Mod.Settings.MSuccess or not result.IsSuccessful and Mod.Settings.MFail) then
 				-- 	local damageTotal = 0;
 				-- 	for id_damaged, damage in pairs(result.DamageToSpecialUnits) do
